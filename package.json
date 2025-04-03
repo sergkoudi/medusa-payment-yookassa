@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "description": "YooKassa provider for Medusa",
   "author": "Sergei Kudinov",
+  "main": ".medusa/server/src/modules/yookassa/index.js",
   "contributors": [
     "Ilya Ivanitski <i.a.ivanitski@gmail.com>"
   ],
@@ -11,8 +12,8 @@
     ".medusa/server"
   ],
   "exports": {
+    ".": "./.medusa/server/src/modules/yookassa/index.js",
     "./package.json": "./package.json",
-    "./workflows": "./.medusa/server/src/workflows/index.js",
     "./.medusa/server/src/modules/*": "./.medusa/server/src/modules/*/index.js",
     "./modules/*": "./.medusa/server/src/modules/*/index.js",
     "./providers/*": "./.medusa/server/src/providers/*/index.js",
@@ -36,10 +37,10 @@
     "@medusajs/admin-sdk": "2.6.1",
     "@medusajs/cli": "2.6.1",
     "@medusajs/framework": "2.6.1",
+    "@medusajs/icons": "2.6.1",
     "@medusajs/medusa": "2.6.1",
     "@medusajs/test-utils": "2.6.1",
     "@medusajs/ui": "4.0.7",
-    "@medusajs/icons": "2.6.1",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -63,10 +64,10 @@
     "@medusajs/admin-sdk": "2.6.1",
     "@medusajs/cli": "2.6.1",
     "@medusajs/framework": "2.6.1",
-    "@medusajs/test-utils": "2.6.1",
-    "@medusajs/medusa": "2.6.1",
-    "@medusajs/ui": "4.0.7",
     "@medusajs/icons": "2.6.1",
+    "@medusajs/medusa": "2.6.1",
+    "@medusajs/test-utils": "2.6.1",
+    "@medusajs/ui": "4.0.7",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -78,5 +79,9 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "dependencies": {
+    "@a2seven/yoo-checkout": "^1.1.4",
+    "medusa-payment-yookassa": "^0.0.3"
+  }
 }
