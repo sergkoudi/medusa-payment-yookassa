@@ -4,7 +4,7 @@ import {
   Modules
 } from "@medusajs/framework/utils"
 
-class YooKassaService extends YooKassaProvider {
+export class YooKassaService extends YooKassaProvider {
     static identifier = 'YooKassa'
   
     constructor(_, options) {
