@@ -27,3 +27,5 @@ build
 
 yarn.lock
 static
+.yalc
+yalc.lock
