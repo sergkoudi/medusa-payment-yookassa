@@ -1,10 +1,12 @@
 "use client"
 
-import { isManual, isStripe } from "@lib/constants"
+import { isManual, isStripe, isYookassa } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
+import { useParams, useRouter } from "next/navigation"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
+import type { IConfirmation } from '@a2seven/yoo-checkout';
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 
@@ -17,6 +19,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
   "data-testid": dataTestId,
 }) => {
+  const { countryCode } = useParams()
   const notReady =
     !cart ||
     !cart.shipping_address ||
@@ -25,6 +28,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     (cart.shipping_methods?.length ?? 0) < 1
 
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+
 
   switch (true) {
     case isStripe(paymentSession?.provider_id):
@@ -38,6 +42,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     case isManual(paymentSession?.provider_id):
       return (
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+      )
+    case isYookassa(paymentSession?.provider_id):
+      return (
+        <YookassaPaymentButton
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
       )
     default:
       return <Button disabled>Select a payment method</Button>
@@ -181,6 +193,61 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         data-testid="submit-order-button"
       >
         Place order
+      </Button>
+      <ErrorMessage
+        error={errorMessage}
+        data-testid="manual-payment-error-message"
+      />
+    </>
+  )
+}
+
+const YookassaPaymentButton = ({
+  cart,
+  notReady,
+  "data-testid": dataTestId,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+  "data-testid"?: string
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const router = useRouter()
+  // const onPaymentCompleted = async () => {
+  //   await placeOrder()
+  //     .catch((err) => {
+  //       setErrorMessage(err.message)
+  //     })
+  //     .finally(() => {
+  //       setSubmitting(false)
+  //     })
+  // }
+
+  const paymentSession = cart.payment_collection?.payment_sessions?.find(
+    session => session.provider_id === "pp_yookassa_yookassa"
+  )
+
+  const handlePayment = () => {
+    setSubmitting(true)
+
+    const confirmation = paymentSession?.data?.confirmation as IConfirmation
+    if (confirmation?.confirmation_url) {
+      // router.push(confirmation.confirmation_url)
+      window.open(confirmation.confirmation_url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  return (
+    <>
+      <Button
+        disabled={notReady}
+        isLoading={submitting}
+        onClick={handlePayment}
+        size="large"
+        data-testid="submit-order-button"
+      >
+        Place an order and pay
       </Button>
       <ErrorMessage
         error={errorMessage}
