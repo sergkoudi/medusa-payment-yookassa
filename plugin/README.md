@@ -47,6 +47,10 @@ Make changes in your Medusa storefront:
 # Instructions will come later...
 ```
 
+## Development
+
+Find documentation on bootstrapping a development environment [here](../examples).
+
 ## References
 
 - [API YooKassa](https://yookassa.ru/developers)
