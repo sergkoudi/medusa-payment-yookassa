@@ -4,11 +4,7 @@
 This repository contains:
 
 - **[plugin/](plugin)** - `medusa-payment-yookassa` plugin source and distribution.
-- **[examples/](examples)** - Example apps (Medusa Admin + Storefront) showing plugin usage.  
-
-## Development
-
-Find documentation on bootstrapping the development environment [here](./examples).
+- **[examples/](examples)** - Example apps (Medusa Admin + Storefront) showing plugin usage and bootstrapping a development environment.  
 
 ## References
 
