@@ -1,7 +1,7 @@
 
-# Examples
+# `medusa-payment-yookassa` plugin examples
 
-Helpful examples for bootstrapping a development environment for the [medusa-payment-yookassa](https://www.npmjs.com/package/medusa-payment-yookassa) plugin.
+Handy examples for setting up a development environment for the [medusa-payment-yookassa](https://www.npmjs.com/package/medusa-payment-yookassa) plugin.
 
 ## Prerequisites
 

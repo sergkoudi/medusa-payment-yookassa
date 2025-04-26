@@ -17,10 +17,11 @@ npm install medusa-payment-yookassa
 
 In your Medusa admin project `medusa-config.js`:
 
-```bash
-...
-modules: [
-    ...
+```js
+# ...
+module.exports = defineConfig({
+  # ...
+  modules: [
     {
       resolve: "@medusajs/medusa/payment",
       options: {
@@ -33,12 +34,11 @@ modules: [
               secretKey: process.env.YOOKASSA_SECRET_KEY
             },
           }
-        ],
-      },
-    },
-    ...
-]
-...
+        ]
+      }
+    }
+  ]
+})
 ```
 
 Make changes in your Medusa storefront:
@@ -49,7 +49,7 @@ Make changes in your Medusa storefront:
 
 ## Development
 
-Find documentation on bootstrapping a development environment [here](../examples).
+Find documentation on bootstrapping a development environment [here](https://github.com/sergkudinov/medusa-payment-yookassa/tree/main/examples).
 
 ## References
 
