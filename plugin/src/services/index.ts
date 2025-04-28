@@ -1,5 +1,5 @@
 import YooKassaProvider from "../core/yookassa-base"
-import { PaymentIntentOptions, PaymentProviderKeys } from "../types"
+import { PaymentOptions, PaymentProviderKeys } from "../types"
 import { 
   ModuleProvider, 
   Modules
@@ -12,11 +12,10 @@ export class YooKassaService extends YooKassaProvider {
       super(_, options)
     }
   
-    get paymentIntentOptions(): PaymentIntentOptions{
+    get paymentOptions(): PaymentOptions{
       return {
         confirmation: {
           type: "redirect",
-          return_url: "http://localhost:8000/"
         },
       }
     }
