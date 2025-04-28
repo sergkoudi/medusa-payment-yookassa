@@ -1,16 +1,13 @@
 import {
-  IAmount,
   ICapturePayment,
   IConfirmationType,
   ICreatePayment,
-  ICreateRefund,
-  IPaymentMethodData,
   YooCheckout,
 } from "@a2seven/yoo-checkout"
 import {
   AbstractPaymentProvider,
-  MedusaError,
   PaymentSessionStatus,
+  isDefined
 } from "@medusajs/framework/utils"
 import {
   AuthorizePaymentInput,
@@ -19,6 +16,8 @@ import {
   CancelPaymentOutput,
   CapturePaymentInput,
   CapturePaymentOutput,
+  DeletePaymentInput,
+  DeletePaymentOutput,
   GetPaymentStatusInput,
   GetPaymentStatusOutput,
   InitiatePaymentInput,
@@ -33,85 +32,86 @@ import {
   RetrievePaymentInput,
   IBigNumber,
 } from "@medusajs/framework/types"
-import { PaymentIntentOptions } from "../types"
-
-type YooKassaOptions = {
-  shopId: string
-  secretKey: string
-}
+import {
+  YooKassaOptions,
+  PaymentOptions
+} from "../types"
 
 export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaOptions> {
-  protected readonly options: YooKassaOptions
-  protected readonly checkout: YooCheckout
-  protected readonly container: Record<string, unknown>
+  protected readonly options_: YooKassaOptions
+  protected yooCheckout_: YooCheckout
+  protected container_: Record<string, unknown>
+
+  static validateOptions(options: YooKassaOptions): void {
+    if (!isDefined(options.shopId)) {
+      throw new Error("Required option `shopId` is missing in YooKassa plugin")
+    }
+    if (!isDefined(options.secretKey)) {
+      throw new Error("Required option `secretKey` is missing in YooKassa plugin")
+    }
+  }
 
   constructor(container: Record<string, unknown>, options: YooKassaOptions) {
-    super(container, options)
-    YooKassaProvider.validateOptions(options)
-    this.options = options
-    this.container = container
-    this.checkout = new YooCheckout({
+    // @ts-ignore
+    super(...arguments)
+
+    this.options_ = options
+    this.container_ = container
+    this.yooCheckout_ = new YooCheckout({
       shopId: options.shopId,
       secretKey: options.secretKey,
     })
   }
 
-  abstract get paymentIntentOptions(): PaymentIntentOptions
+  abstract get paymentOptions(): PaymentOptions
 
-  static validateOptions(options: Partial<YooKassaOptions>): void {
-    if (!options.shopId || !options.secretKey) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        "SHOP_ID and SECRET_KEY are required in the provider's options."
-      )
-    }
+  get options(): YooKassaOptions {
+    return this.options_
   }
-
+  
   /**
    * Capture an existing payment.
    */
   async capturePayment(input: CapturePaymentInput): Promise<CapturePaymentOutput> {
-    console.log("capturePayment", input)
     const paymentId = input.data?.id as string
     const payload = input.data?.payload as ICapturePayment
     const idempotencyKey = input.context?.idempotency_key
 
     try {
-      const response = await this.checkout.capturePayment(paymentId, payload, idempotencyKey)
+      const response = await this.yooCheckout_.capturePayment(paymentId, payload, idempotencyKey)
       return { data: response as unknown as Record<string, unknown> }
-    } catch (error) {
-      throw this.createError("Capture payment failed", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in capturePayment", e)
     }
   }
+
   /**
-     * Initiate a new payment.
-     */
+   * Initiate a new payment.
+   */
   async initiatePayment({
     currency_code,
     amount,
     data,
     context,
   }: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
-    console.log("initiatePayment data", data)
-
     const createPayload: ICreatePayment = {
       amount: {
         value: amount as string,
-        currency: currency_code.toUpperCase(), // TODO convert to ISO-4217 instead
+        currency: currency_code.toUpperCase(), // TODO: convert to ISO-4217 instead
       },
       "payment_method_data": {
         "type": "bank_card"
       },
+      capture: this.options_.capture,
       confirmation: {
-        type: this.paymentIntentOptions?.confirmation?.type as IConfirmationType,
-        return_url: this.paymentIntentOptions?.confirmation?.return_url as string,
+        type: this.paymentOptions?.confirmation?.type as IConfirmationType,
+        return_url: data?.return_url as string,
       },
-      description: ""      
+      description: ""
     }
 
-
     try {
-      const response = await this.checkout.createPayment(createPayload, context?.idempotency_key)
+      const response = await this.yooCheckout_.createPayment(createPayload, context?.idempotency_key)
       console.log('response ---', response)
       // Если объект содержит id, считаем его платежным намерением
       const paymentId = "id" in response ? response.id : (data?.session_id as string)
@@ -119,8 +119,8 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
         id: paymentId,
         data: response as unknown as Record<string, unknown>,
       }
-    } catch (error) {
-      throw this.createError("Initiate payment failed", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in initiatePayment", e)
     }
   }
 
@@ -130,18 +130,16 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   async getPaymentStatus({
     data
   }: GetPaymentStatusInput): Promise<GetPaymentStatusOutput> {
-    console.log("getPaymentStatus", data)
     const id = data?.id as string
     if (!id) {
-      throw this.createError(
-        "No payment intent ID provided while getting payment status",
-        new Error("Missing ID")
+      throw this.buildError(
+        "No payment ID provided while getting payment status",
+        new Error("No payment intent ID provided")
       )
     }
 
     try {
-      const payment = await this.checkout.getPayment(id)
-      console.log("getPaymentStatus payment", payment)
+      const payment = await this.yooCheckout_.getPayment(id)
       const paymentData = payment as unknown as Record<string, unknown>
 
       switch (payment.status) {
@@ -156,8 +154,8 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
         default:
           return { status: PaymentSessionStatus.PENDING, data: paymentData }
       }
-    } catch (error) {
-      throw this.createError("Failed to get payment status", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in refundPayment", e)
     }
   }
 
@@ -168,7 +166,6 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   async authorizePayment(input: AuthorizePaymentInput): Promise<AuthorizePaymentOutput> {
     console.log("authorizePayment", input)
     const statusResponse = await this.getPaymentStatus(input)
-    console.log("statusResponse", statusResponse)
     return statusResponse
   }
 
@@ -181,10 +178,10 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
     const idempotencyKey = input.context?.idempotency_key
 
     try {
-      const response = await this.checkout.cancelPayment(paymentId, idempotencyKey)
+      const response = await this.yooCheckout_.cancelPayment(paymentId, idempotencyKey)
       return { data: response as unknown as Record<string, unknown> }
-    } catch (error) {
-      throw this.createError("Cancel payment failed", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in cancelPayment", e)
     }
   }
 
@@ -194,10 +191,10 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   async retrievePayment(input: RetrievePaymentInput): Promise<RetrievePaymentOutput> {
     console.log("retrievePayment", input)
     try {
-      const payment = await this.checkout.getPayment(input.data?.id as string)
+      const payment = await this.yooCheckout_.getPayment(input.data?.id as string)
       return payment as unknown as Record<string, unknown>
-    } catch (error) {
-      throw this.createError("Failed to retrieve payment", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in retrievePayment", e)
     }
   }
 
@@ -218,33 +215,27 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
     }
 
     try {
-      const refund = await this.checkout.createRefund(refundPayload, input.context?.idempotency_key)
+      const refund = await this.yooCheckout_.createRefund(refundPayload, input.context?.idempotency_key)
       return { data: refund as unknown as Record<string, unknown> }
-    } catch (error) {
-      throw this.createError("Refund failed", error as Error)
+    } catch (e) {
+      throw this.buildError("An error occurred in refundPayment", e)
     }
   }
 
   /**
-   * Deletion of payments is not supported.
+   * Delete a payment.
+   * Payment deletion is not supported by YooKassa.
    */
-  async deletePayment(input: Record<string, unknown>): Promise<Record<string, unknown>> {
-    console.log("deletePayment", input)
-
-    throw new MedusaError(
-      MedusaError.Types.NOT_ALLOWED,
-      "Payment deletion is not supported by YooKassa"
-    )
+  async deletePayment(input: DeletePaymentInput): Promise<DeletePaymentOutput> {
+    return input
   }
 
   /**
    * Update a payment.
-   * YooKassa не поддерживает прямое обновление платежей.
+   * Payment update is not supported by YooKassa.
    */
   async updatePayment(input: UpdatePaymentInput): Promise<UpdatePaymentOutput> {
-    console.log("updatePayment", input)
-
-    return { data: input.data ?? {} }
+    return input
   }
 
   /**
@@ -269,14 +260,14 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   }
 
   /**
-   * Helper to build and log errors with additional context.
+   * Helper to build errors with additional context.
    */
-  protected createError(message: string, error: Error): Error {
-    console.log("createError", message, error)
+  protected buildError(message: string, error: Error): Error {
+    const errorDetails =
+      "raw" in error ? (error.raw as any) : error
 
-    const errorDetails = ("raw" in error ? (error as any).raw : error) as object
     return new Error(
-      `${message}: ${error.message}. ${"detail" in errorDetails ? (errorDetails as any).detail : ""}`.trim()
+      `${message}: ${error.message}. ${"detail" in errorDetails ? errorDetails.detail : ""}`.trim()
     )
   }
 }
