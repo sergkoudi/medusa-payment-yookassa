@@ -1,7 +1,7 @@
 {
   "name": "medusa-payment-yookassa",
   "version": "0.0.7",
-  "description": "YooKassa provider for Medusa",
+  "description": "YooKassa payment provider for Medusa",
   "author": "Sergei Kudinov",
   "license": "MIT",
   "files": [
@@ -14,17 +14,26 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": "./.medusa/server/src/providers/payment-yookassa/index.js"
+    "./providers/*": "./.medusa/server/src/providers/*/index.js",
+    "./admin": {
+      "import": "./.medusa/server/src/admin/index.mjs",
+      "require": "./.medusa/server/src/admin/index.js",
+      "default": "./.medusa/server/src/admin/index.js"
+    },
+    "./*": "./.medusa/server/src/*.js"
   },
   "keywords": [
     "medusa",
-    "plugin",
-    "medusa-plugin-other",
-    "medusa-plugin",
     "medusa-v2",
-    "payment-yookassa",
+    "medusa-plugin",
+    "medusa-plugin-integration",
+    "medusa-plugin-payment",
+    "medusa-payment",
+    "medusa-payment-yookassa",
     "yookassa",
-    "payment"
+    "yoomoney",
+    "payment",
+    "plugin"
   ],
   "scripts": {
     "build": "medusa plugin:build",
@@ -39,6 +48,7 @@
     "@medusajs/icons": "2.7.1",
     "@medusajs/medusa": "2.7.1",
     "@medusajs/test-utils": "2.7.1",
+    "@medusajs/ui": "4.0.9",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -65,6 +75,7 @@
     "@medusajs/icons": "2.7.1",
     "@medusajs/medusa": "2.7.1",
     "@medusajs/test-utils": "2.7.1",
+    "@medusajs/ui": "4.0.9",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
