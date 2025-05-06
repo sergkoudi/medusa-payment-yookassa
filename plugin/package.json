@@ -3,14 +3,13 @@
   "version": "0.0.4",
   "description": "YooKassa provider for Medusa",
   "author": "Sergei Kudinov",
-  "main": ".medusa/server/src/index.js",
   "license": "MIT",
   "files": [
     ".medusa/server"
   ],
   "exports": {
     "./package.json": "./package.json",
-    ".": "./.medusa/server/src/index.js"
+    ".": "./.medusa/server/src/providers/payment-yookassa/index.js"
   },
   "keywords": [
     "medusa",
