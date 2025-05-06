@@ -13,6 +13,16 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     }
   },
+  admin: {
+    vite: () => {
+      return {
+        // Using tunneling for testing YooKassa webhooks
+        server: {
+          allowedHosts: true,
+        },
+      }
+    },
+  },
   modules: [
     {
       resolve: "@medusajs/medusa/payment",
@@ -23,7 +33,9 @@ module.exports = defineConfig({
             id: "yookassa",
             options: {
               shopId: process.env.YOOKASSA_SHOP_ID,
-              secretKey: process.env.YOOKASSA_SECRET_KEY
+              secretKey: process.env.YOOKASSA_SECRET_KEY,
+              capture: true,
+              paymentDescription: "Test payment"
             },
           },
           {

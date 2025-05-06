@@ -3,6 +3,7 @@
 import { RadioGroup } from "@headlessui/react"
 import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
+import { getBaseURL } from "@lib/util/env"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -10,7 +11,7 @@ import PaymentContainer, {
   StripeCardContainer,
 } from "@modules/checkout/components/payment-container"
 import Divider from "@modules/common/components/divider"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
 const Payment = ({
@@ -35,6 +36,7 @@ const Payment = ({
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
+  const { countryCode } = useParams()
 
   const isOpen = searchParams.get("step") === "payment"
 
@@ -84,6 +86,12 @@ const Payment = ({
       if (!checkActiveSession) {
         await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
+          data: {
+            confirmation: {
+              type: "redirect",
+              return_url: `${getBaseURL()}/api/capture-payment/${cart?.id}?country_code=${countryCode}`
+            }
+          }
         })
       }
 
