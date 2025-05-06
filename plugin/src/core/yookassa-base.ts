@@ -1,12 +1,18 @@
 import {
-  ICapturePayment,
-  IConfirmationType,
-  ICreatePayment,
   YooCheckout,
+  ICapturePayment,
+  IConfirmationWithoutData,
+  ICreatePayment,
+  PaymentStatuses,
+  Payment,
+  Refund,
+  WebHookEvents
 } from "@a2seven/yoo-checkout"
+import axios, { AxiosError } from "axios"
 import {
   AbstractPaymentProvider,
   PaymentSessionStatus,
+  PaymentActions,
   isDefined
 } from "@medusajs/framework/utils"
 import {
@@ -22,7 +28,7 @@ import {
   GetPaymentStatusOutput,
   InitiatePaymentInput,
   InitiatePaymentOutput,
-  WebhookActionData,
+  ProviderWebhookPayload,
   WebhookActionResult,
   RefundPaymentInput,
   RefundPaymentOutput,
@@ -30,19 +36,20 @@ import {
   UpdatePaymentOutput,
   RetrievePaymentOutput,
   RetrievePaymentInput,
-  IBigNumber,
+  IBigNumber
 } from "@medusajs/framework/types"
 import {
-  YooKassaOptions,
-  PaymentOptions
+  PaymentOptions,
+  YookassaOptions,
+  YookassaEvent
 } from "../types"
 
-export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaOptions> {
-  protected readonly options_: YooKassaOptions
+abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
+  protected readonly options_: YookassaOptions
   protected yooCheckout_: YooCheckout
   protected container_: Record<string, unknown>
 
-  static validateOptions(options: YooKassaOptions): void {
+  static validateOptions(options: YookassaOptions): void {
     if (!isDefined(options.shopId)) {
       throw new Error("Required option `shopId` is missing in YooKassa plugin")
     }
@@ -51,7 +58,7 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
     }
   }
 
-  constructor(container: Record<string, unknown>, options: YooKassaOptions) {
+  protected constructor(container: Record<string, unknown>, options: YookassaOptions) {
     // @ts-ignore
     super(...arguments)
 
@@ -65,24 +72,29 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
 
   abstract get paymentOptions(): PaymentOptions
 
-  get options(): YooKassaOptions {
+  get options(): YookassaOptions {
     return this.options_
   }
-  
-  /**
-   * Capture an existing payment.
-   */
-  async capturePayment(input: CapturePaymentInput): Promise<CapturePaymentOutput> {
-    const paymentId = input.data?.id as string
-    const payload = input.data?.payload as ICapturePayment
-    const idempotencyKey = input.context?.idempotency_key
 
-    try {
-      const response = await this.yooCheckout_.capturePayment(paymentId, payload, idempotencyKey)
-      return { data: response as unknown as Record<string, unknown> }
-    } catch (e) {
-      throw this.buildError("An error occurred in capturePayment", e)
-    }
+  private normalizePaymentParameters(
+    extra?: Record<string, unknown>
+  ): Partial<ICreatePayment> {
+    const res = {} as Partial<ICreatePayment>
+
+    res.description =
+      extra?.description as string ??
+      this.options_?.paymentDescription
+
+    res.capture =
+      extra?.capture as boolean ??
+      this.paymentOptions.capture ??
+      this.options_.capture
+
+    res.payment_method_data = this.paymentOptions?.payment_method_data
+
+    res.confirmation = extra?.confirmation as IConfirmationWithoutData | undefined
+
+    return res
   }
 
   /**
@@ -94,26 +106,23 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
     data,
     context,
   }: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
+    console.log("initiatePayment data", data)
+    const additionalParameters = this.normalizePaymentParameters(data)
+
     const createPayload: ICreatePayment = {
       amount: {
         value: amount as string,
-        currency: currency_code.toUpperCase(), // TODO: convert to ISO-4217 instead
+        currency: currency_code.toUpperCase(), // Medusa stores currency codes in lower case of ISO-4217
       },
-      "payment_method_data": {
-        "type": "bank_card"
+      metadata: {
+        session_id: data?.session_id as string
       },
-      capture: this.options_.capture,
-      confirmation: {
-        type: this.paymentOptions?.confirmation?.type as IConfirmationType,
-        return_url: data?.return_url as string,
-      },
-      description: ""
+      ...additionalParameters
     }
 
     try {
       const response = await this.yooCheckout_.createPayment(createPayload, context?.idempotency_key)
-      console.log('response ---', response)
-      // Если объект содержит id, считаем его платежным намерением
+      console.log("response", response)
       const paymentId = "id" in response ? response.id : (data?.session_id as string)
       return {
         id: paymentId,
@@ -130,11 +139,12 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   async getPaymentStatus({
     data
   }: GetPaymentStatusInput): Promise<GetPaymentStatusOutput> {
+    console.log("getPaymentStatus", data)
     const id = data?.id as string
     if (!id) {
       throw this.buildError(
         "No payment ID provided while getting payment status",
-        new Error("No payment intent ID provided")
+        new Error("No payment ID provided")
       )
     }
 
@@ -143,22 +153,44 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
       const paymentData = payment as unknown as Record<string, unknown>
 
       switch (payment.status) {
-        case "pending":
-          return { status: PaymentSessionStatus.REQUIRES_MORE, data: paymentData }
-        case "canceled":
+        case PaymentStatuses.pending:
+          return { status: PaymentSessionStatus.PENDING, data: paymentData }
+        case PaymentStatuses.canceled:
           return { status: PaymentSessionStatus.CANCELED, data: paymentData }
-        case "waiting_for_capture":
+        case PaymentStatuses.waiting_for_capture:
           return { status: PaymentSessionStatus.AUTHORIZED, data: paymentData }
-        case "succeeded":
+        case PaymentStatuses.succeeded:
           return { status: PaymentSessionStatus.CAPTURED, data: paymentData }
         default:
           return { status: PaymentSessionStatus.PENDING, data: paymentData }
       }
     } catch (e) {
-      throw this.buildError("An error occurred in refundPayment", e)
+      throw this.buildError("An error occurred in getPaymentStatus", e)
     }
   }
 
+  /**
+   * Capture an existing payment.
+   */
+  async capturePayment(input: CapturePaymentInput): Promise<CapturePaymentOutput> {
+    console.log("capturePayment", input)
+    const payment = input.data as unknown as Payment
+
+    // Avoid autoCapture in https://github.com/medusajs/medusa/blob/ceb504db2ce44dec43dff652fb306eb4e4f6059e/packages/modules/payment/src/services/payment-module.ts#L590
+    if (payment.status === PaymentStatuses.succeeded)
+      return { data: input }
+
+    const payload: ICapturePayment = {
+      amount: payment.amount
+    }
+    const idempotencyKey = input.context?.idempotency_key
+    try {
+      const response = await this.yooCheckout_.capturePayment(payment.id, payload, idempotencyKey)
+      return { data: response as unknown as Record<string, unknown> }
+    } catch (e) {
+      throw this.buildError("An error occurred in capturePayment", e)
+    }
+  }
 
   /**
    * Authorize a payment by retrieving its status.
@@ -186,7 +218,7 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   }
 
   /**
-   * Retrieve a payment by ID.
+   * Retrieve a payment.
    */
   async retrievePayment(input: RetrievePaymentInput): Promise<RetrievePaymentOutput> {
     console.log("retrievePayment", input)
@@ -241,35 +273,85 @@ export abstract class YooKassaProvider extends AbstractPaymentProvider<YooKassaO
   /**
    * Process webhook event and map it to Medusa action.
    */
-  async getWebhookActionAndData(data: Record<string, unknown>): Promise<WebhookActionResult> {
-    console.log("getWebhookActionAndData", data)
+  async getWebhookActionAndData(webhookData: ProviderWebhookPayload["payload"]): Promise<WebhookActionResult> {
+    console.log("webhookData", webhookData)
+    console.log("webhookData.data.object", webhookData.data.object)
+    const isValid = await this.isWebhookEventValid(webhookData)
+    if (!isValid)
+      return {
+        action: PaymentActions.NOT_SUPPORTED
+      }
 
-    const event = data.event as string
-    const paymentData = data.object as Record<string, unknown>
+    const { event, object } = webhookData.data as unknown as YookassaEvent
 
     switch (event) {
-      case "payment.succeeded":
-        return { action: "captured", data: paymentData as WebhookActionData }
-      case "payment.waiting_for_capture":
-        return { action: "authorized", data: paymentData as WebhookActionData }
-      case "payment.canceled":
-        return { action: "canceled", data: paymentData as WebhookActionData }
+      case WebHookEvents["payment.succeeded"]:
+        return {
+          action: PaymentActions.SUCCESSFUL,
+          data: {
+            session_id: (object as Payment).metadata.session_id,
+            amount: (object as Payment).amount.value,
+          }
+        }
+      case WebHookEvents["payment.waiting_for_capture"]:
+        return {
+          action: PaymentActions.AUTHORIZED,
+          data: {
+            session_id: (object as Payment).metadata.session_id,
+            amount: (object as Payment).amount.value,
+          },
+        }
+      case WebHookEvents["payment.canceled"]:
+        return {
+          action: PaymentActions.CANCELED,
+          data: {
+            session_id: (object as Payment).metadata.session_id,
+            amount: (object as Payment).amount.value,
+          },
+        }
       default:
-        return { action: "not_supported", data: paymentData as WebhookActionData }
+        return {
+          action: PaymentActions.NOT_SUPPORTED
+        }
+    }
+  }
+
+  /**
+   * Validate Webhook event
+   * @param {object} webhookData - the data of the webhook request: req.body
+   * @returns {boolean} - stutus of validation
+   */
+  protected async isWebhookEventValid(webhookData: ProviderWebhookPayload["payload"]): Promise<boolean> {
+    const [object, status] = (webhookData.data.event as YookassaEvent["event"]).split('.');
+    try {
+      switch (object) {
+        case "payment":
+          const payment = await this.yooCheckout_.getPayment((webhookData.data.object as Payment).id)
+          return payment.status === status
+        case "refund":
+          const refund = await this.yooCheckout_.getRefund((webhookData.data.object as Refund).id)
+          return refund.status === status
+        default:
+          return false
+      }
+    } catch (e) {
+      throw this.buildError(`An error occurred in isWebhookEventValid when validating a ${object}`, e)
     }
   }
 
   /**
    * Helper to build errors with additional context.
    */
-  protected buildError(message: string, error: Error): Error {
-    const errorDetails =
-      "raw" in error ? (error.raw as any) : error
-
+  protected buildError(message: string, error: Error | AxiosError): Error {
+    if (axios.isAxiosError(error)) {
+      return new Error(
+        `${message}: ${error.response?.status} ${error.response?.data?.code} - ${error.response?.data?.description}`.trim()
+      )
+    }
     return new Error(
-      `${message}: ${error.message}. ${"detail" in errorDetails ? errorDetails.detail : ""}`.trim()
+      `${message}: ${error.message}`.trim()
     )
   }
 }
 
-export default YooKassaProvider
+export default YookassaBase

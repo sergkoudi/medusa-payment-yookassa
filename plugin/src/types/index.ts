@@ -1,8 +1,11 @@
 import {
-  IConfirmationWithoutData,
+  IWebHookEvent,
+  Payment,
+  Refund,
+  ICreatePayment
 } from "@a2seven/yoo-checkout"
 
-export interface YooKassaOptions {
+export interface YookassaOptions {
   /**
    * The SHOP_ID of YooKassa
    */
@@ -14,15 +17,19 @@ export interface YooKassaOptions {
   /**
    * Use this flag to capture payment immediately (default is false)
    */
-  capture?: boolean
+  capture?: boolean,
   /**
-   * Set a default description on the intent if the context does not provide one
+   * Set a default description on the payment if the context does not provide one
    */
   paymentDescription?: string
 }
 
-export interface PaymentOptions {
-  confirmation?: IConfirmationWithoutData,
+export interface PaymentOptions extends Partial<ICreatePayment> { }
+
+export interface YookassaEvent {
+  type: "notification",
+  event: IWebHookEvent,
+  object: Payment | Refund | object
 }
 
 export const PaymentProviderKeys = {
