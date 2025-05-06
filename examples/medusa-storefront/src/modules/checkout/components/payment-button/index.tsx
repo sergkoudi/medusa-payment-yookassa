@@ -204,8 +204,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
 
 const YookassaPaymentButton = ({
   cart,
-  notReady,
-  "data-testid": dataTestId,
+  notReady
 }: {
   cart: HttpTypes.StoreCart
   notReady: boolean
@@ -214,15 +213,6 @@ const YookassaPaymentButton = ({
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const router = useRouter()
-  // const onPaymentCompleted = async () => {
-  //   await placeOrder()
-  //     .catch((err) => {
-  //       setErrorMessage(err.message)
-  //     })
-  //     .finally(() => {
-  //       setSubmitting(false)
-  //     })
-  // }
 
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     session => session.provider_id === "pp_yookassa_yookassa"
@@ -233,8 +223,7 @@ const YookassaPaymentButton = ({
 
     const confirmation = paymentSession?.data?.confirmation as IConfirmation
     if (confirmation?.confirmation_url) {
-      // router.push(confirmation.confirmation_url)
-      window.open(confirmation.confirmation_url, '_blank', 'noopener,noreferrer');
+      router.push(confirmation.confirmation_url)
     }
   }
 

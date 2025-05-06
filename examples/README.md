@@ -1,5 +1,5 @@
 
-# `medusa-payment-yookassa` plugin examples
+# Examples for `medusa-payment-yookassa`
 
 Handy examples for setting up a development environment for the [medusa-payment-yookassa](https://www.npmjs.com/package/medusa-payment-yookassa) plugin.
 
@@ -8,6 +8,7 @@ Handy examples for setting up a development environment for the [medusa-payment-
 - Node.js v20+
 - Yarn
 - Docker & Docker Compose (optional, for spinning up PosgreSQL)
+- A [YooKassa](https://yookassa.ru/joinups/?source=ks) account, a shop identifier `shopId` and a secret API key `secretKey`.
 
 ## Bootstrap development
 

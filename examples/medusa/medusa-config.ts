@@ -16,7 +16,7 @@ module.exports = defineConfig({
   admin: {
     vite: () => {
       return {
-        // Using tunneling for testing YooKassa webhooks
+        // Used only during testing, do not enable in production
         server: {
           allowedHosts: true,
         },
@@ -29,7 +29,7 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: "medusa-payment-yookassa",
+            resolve: "medusa-payment-yookassa/providers/payment-yookassa",
             id: "yookassa",
             options: {
               shopId: process.env.YOOKASSA_SHOP_ID,
@@ -38,6 +38,7 @@ module.exports = defineConfig({
               paymentDescription: "Test payment"
             },
           },
+          // Used for testing
           {
             resolve: "@medusajs/medusa/payment-stripe",
             id: "stripe",
