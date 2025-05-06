@@ -1,19 +1,16 @@
 {
   "name": "medusa-payment-yookassa",
-  "version": "0.0.5",
+  "version": "0.0.4",
   "description": "YooKassa provider for Medusa",
   "author": "Sergei Kudinov",
-  "main": ".medusa/server/src/services/index.js",
-  "contributors": [
-    "Ilya Ivanitski <i.a.ivanitski@gmail.com>"
-  ],
+  "main": ".medusa/server/src/index.js",
   "license": "MIT",
   "files": [
     ".medusa/server"
   ],
   "exports": {
-    ".": "./.medusa/server/src/services/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    ".": "./.medusa/server/src/index.js"
   },
   "keywords": [
     "medusa",
@@ -21,12 +18,13 @@
     "medusa-plugin-other",
     "medusa-plugin",
     "medusa-v2",
+    "payment-yookassa",
     "yookassa",
     "payment"
   ],
   "scripts": {
     "build": "medusa plugin:build",
-    "dev": "medusa plugin:develop",
+    "dev": "yarn predev && medusa plugin:develop",
     "predev": "medusa plugin:publish",
     "prepublishOnly": "medusa plugin:build"
   },
@@ -74,8 +72,9 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "dependencies": {
-    "@a2seven/yoo-checkout": "^1.1.4"
-  }
+    "@a2seven/yoo-checkout": "^1.1.4",
+    "axios": "^1.9.0"
+  },
+  "packageManager": "yarn@4.9.1"
 }
