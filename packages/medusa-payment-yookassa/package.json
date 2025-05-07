@@ -1,6 +1,6 @@
 {
   "name": "medusa-payment-yookassa",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "YooKassa payment provider for Medusa",
   "author": "Sergei Kudinov",
   "license": "MIT",
