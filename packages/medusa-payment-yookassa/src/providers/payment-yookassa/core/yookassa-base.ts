@@ -3,6 +3,7 @@ import {
   ICapturePayment,
   IConfirmationWithoutData,
   ICreatePayment,
+  ICreateRefund,
   PaymentStatuses,
   Payment,
   Refund,
@@ -13,6 +14,7 @@ import {
   AbstractPaymentProvider,
   PaymentSessionStatus,
   PaymentActions,
+  BigNumber,
   isDefined
 } from "@medusajs/framework/utils"
 import {
@@ -35,14 +37,15 @@ import {
   UpdatePaymentInput,
   UpdatePaymentOutput,
   RetrievePaymentOutput,
-  RetrievePaymentInput,
-  IBigNumber
+  RetrievePaymentInput
 } from "@medusajs/framework/types"
+
 import {
   PaymentOptions,
   YookassaOptions,
   YookassaEvent
 } from "../types"
+
 
 abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
   protected readonly options_: YookassaOptions
@@ -224,7 +227,7 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
     console.log("retrievePayment", input)
     try {
       const payment = await this.yooCheckout_.getPayment(input.data?.id as string)
-      return payment as unknown as Record<string, unknown>
+      return { data: payment as unknown as Record<string, unknown> }
     } catch (e) {
       throw this.buildError("An error occurred in retrievePayment", e)
     }
@@ -233,22 +236,32 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
   /**
    * Refund a payment.
    */
-  async refundPayment(input: RefundPaymentInput): Promise<RefundPaymentOutput> {
-    console.log("refundPayment", input)
+  async refundPayment({
+    amount,
+    data,
+    context,
+  }: RefundPaymentInput): Promise<RefundPaymentOutput> {
+    console.log("refundPayment", {amount, data, context})
+    const payment = data as unknown as Payment
+    const id = payment?.id
+    if (!id) {
+      throw this.buildError(
+        "No payment ID provided while refunding payment",
+        new Error("No payment ID provided")
+      )
+    }
 
-    const paymentId = input.data?.id as string
-    const amount = input.amount as IBigNumber
-    const refundPayload = {
-      payment_id: paymentId,
+    const payload: ICreateRefund = {
+      payment_id: id,
       amount: {
-        value: amount.toString(),
-        currency: input.data?.currency_code as string,
+        value: new BigNumber(amount).numeric.toString(),
+        currency: payment?.amount?.currency,
       },
     }
 
     try {
-      const refund = await this.yooCheckout_.createRefund(refundPayload, input.context?.idempotency_key)
-      return { data: refund as unknown as Record<string, unknown> }
+      await this.yooCheckout_.createRefund(payload, context?.idempotency_key)
+      return await this.retrievePayment({data})
     } catch (e) {
       throw this.buildError("An error occurred in refundPayment", e)
     }
