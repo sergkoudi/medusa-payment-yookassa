@@ -70,9 +70,9 @@ To see the exact differences, check the [comparison page](https://github.com/ser
 
 Find documentation on bootstrapping a development environment [here](https://github.com/sergkudinov/medusa-payment-yookassa/tree/main/examples).
 
-## References
+## Support & Feedback
 
-- [API YooKassa](https://yookassa.ru/developers)
+Join the [Medusa Telegram community chat](https://t.me/medusajs_com) to discuss features, get support, and connect with developers building on Medusa.
 
 ## License
 
