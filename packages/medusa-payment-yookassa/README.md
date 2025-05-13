@@ -1,19 +1,12 @@
 <p align="center">
   <a href="https://www.medusajs.com">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-      <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-      <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg" height="50">
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/9a99f9e8-f80e-4411-9bed-6e2032b1ab1c">
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/9a99f9e8-f80e-4411-9bed-6e2032b1ab1c">
+      <img alt="Medusa logo" src="https://github.com/user-attachments/assets/9a99f9e8-f80e-4411-9bed-6e2032b1ab1c" height="120">
     </picture>
   </a>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://yookassa.ru">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/8269a9c9-53ab-4c55-ad6c-72bbaa334e20">
-      <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/25d8717e-8b81-4584-902b-6b921afd3f92">
-      <img alt="YooKassa logo" src="https://github.com/user-attachments/assets/25d8717e-8b81-4584-902b-6b921afd3f92" height="50">
-    </picture>
-  </a>
+  
 </p>
 
 <h1 align="center">
