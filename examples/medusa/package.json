@@ -18,13 +18,14 @@
     "start": "medusa start",
     "dev": "medusa develop",
     "dev:tunnel": "concurrently \"yarn dev\" \"dotenv -e .env -- yarn tunnel\"",
-    "tunnel": "lt --port 9000 --subdomain $LOCALTUNNEL_SUBDOMAIN"
+    "tunnel": "lt --port 9000 --subdomain $LOCALTUNNEL_SUBDOMAIN",
+    "db:migrate": "medusa db:migrate"
   },
   "dependencies": {
-    "@medusajs/admin-sdk": "2.7.1",
-    "@medusajs/cli": "2.7.1",
-    "@medusajs/framework": "2.7.1",
-    "@medusajs/medusa": "2.7.1",
+    "@medusajs/admin-sdk": "2.8.1",
+    "@medusajs/cli": "2.8.1",
+    "@medusajs/framework": "2.8.1",
+    "@medusajs/medusa": "2.8.1",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
     "@mikro-orm/migrations": "6.4.3",
@@ -34,7 +35,7 @@
     "pg": "^8.13.0"
   },
   "devDependencies": {
-    "@medusajs/test-utils": "2.7.1",
+    "@medusajs/test-utils": "2.8.1",
     "@mikro-orm/cli": "6.4.3",
     "@swc/core": "1.5.7",
     "@swc/jest": "^0.2.36",
