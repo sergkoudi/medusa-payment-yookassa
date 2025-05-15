@@ -14,11 +14,21 @@ YooKassa Payments for Medusa
 </h1>
 
 <p align="center">
-A Medusa plugin that provides YooKassa (aka YooMoney) payments.
+A Medusa plugin that provides YooKassa payments.
 </p>
+
 <p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/develop/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/Telegram-Join%20Medusa%20Community%20Chat-0088cc?logo=telegram&logoColor=white" alt="Join on Telegram" />
+  <a href="https://t.me/medusajs_com">
+    <img src="https://img.shields.io/badge/Telegram-Join_Medusa_Community_Chat-0088cc?logo=telegram&style=social" alt="Join on Telegram" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://medusajs.com">
+    <img src="https://img.shields.io/badge/Medusa-^2.7.0-blue?logo=medusa" alt="Medusa" />
+  </a>
+  <a href="https://medusajs.com">
+    <img src="https://img.shields.io/badge/Tested_with_Medusa-v2.8.1-green?logo=checkmarx" alt="Medusa" />
   </a>
 </p>
 
