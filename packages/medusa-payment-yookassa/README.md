@@ -18,7 +18,7 @@ A Medusa plugin that provides YooKassa payments.
 </p>
 
 <p align="center">
-  <a href="https://t.me/medusajs_com">
+  <a href="https://t.me/medusajs_chat">
     <img src="https://img.shields.io/badge/Telegram-Join_Medusa_Community_Chat-0088cc?logo=telegram&style=social" alt="Join on Telegram" />
   </a>
 </p>
@@ -28,7 +28,7 @@ A Medusa plugin that provides YooKassa payments.
     <img src="https://img.shields.io/badge/Medusa-^2.7.0-blue?logo=medusa" alt="Medusa" />
   </a>
   <a href="https://medusajs.com">
-    <img src="https://img.shields.io/badge/Tested_with_Medusa-v2.8.4-green?logo=checkmarx" alt="Medusa" />
+    <img src="https://img.shields.io/badge/Tested_with_Medusa-v2.8.6-green?logo=checkmarx" alt="Medusa" />
   </a>
 </p>
 
@@ -92,16 +92,23 @@ https://{YOUR_MEDUSA_DOMAIN}/hooks/payment/yookassa_yookassa
 ## Storefront Integration
 
 Make the necessary changes to your Medusa storefront.
-You can refer to the modifications made in the [Medusa Next.js Starter Template](https://github.com/medusajs/nextjs-starter-medusa), which are located in the [`examples/medusa-storefront`](https://github.com/sergkudinov/medusa-payment-yookassa/tree/main/examples/medusa-storefront) directory.
-To see the exact differences, check the [comparison page](https://github.com/sergkudinov/medusa-payment-yookassa/compare/v0.0.0...main).
+You can refer to the modifications made in the [Medusa Next.js Starter Template](https://github.com/medusajs/nextjs-starter-medusa), which are located in the [`examples/medusa-storefront`](https://github.com/sergkoudi/medusa-payment-yookassa/tree/main/examples/medusa-storefront) directory.
+
+To view the specific changes, visit the [comparison page](https://github.com/sergkoudi/medusa-payment-yookassa/compare/v0.0.3...main) and explore the differencies under the `examples/medusa-storefront` dirrectory. Or run diff in the terminal:
+
+```bash
+git clone https://github.com/sergkoudi/medusa-payment-yookassa
+cd medusa-payment-yookassa
+git diff v0.0.3...main -- examples/medusa-storefront
+```
 
 ## Development
 
-Find documentation on bootstrapping a development environment [here](https://github.com/sergkudinov/medusa-payment-yookassa/tree/main/examples).
+Find documentation on bootstrapping a development environment [here](https://github.com/sergkoudi/medusa-payment-yookassa/tree/main/examples).
 
 ## 💬 Support & Community on Telegram
 
-Join the [Medusa Telegram community chat](https://t.me/medusajs_com) to discuss features, get support, and connect with developers building on Medusa.
+Join the [Medusa Telegram community chat](https://t.me/medusajs_chat) to discuss features, get support, and connect with developers building on Medusa.
 
 ## License
 
