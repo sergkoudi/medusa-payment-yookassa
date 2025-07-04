@@ -94,7 +94,7 @@ https://{YOUR_MEDUSA_DOMAIN}/hooks/payment/yookassa_yookassa
 Make the necessary changes to your Medusa storefront.
 You can refer to the modifications made in the [Medusa Next.js Starter Template](https://github.com/medusajs/nextjs-starter-medusa), which are located in the [`examples/medusa-storefront`](https://github.com/sergkoudi/medusa-payment-yookassa/tree/main/examples/medusa-storefront) directory.
 
-To view the specific changes, visit the [comparison page](https://github.com/sergkoudi/medusa-payment-yookassa/compare/v0.0.3...main) and explore the differencies under the `examples/medusa-storefront` dirrectory. Or run diff in the terminal:
+To view the specific changes, visit the [comparison page](https://github.com/sergkoudi/medusa-payment-yookassa/compare/v0.0.3...main), open the "Files changed" tab, and explore the differences under the `examples/medusa-storefront` directory. Or run diff in the terminal:
 
 ```bash
 git clone https://github.com/sergkoudi/medusa-payment-yookassa
