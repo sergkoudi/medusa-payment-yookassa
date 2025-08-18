@@ -12,6 +12,7 @@ import {
 import axios, { AxiosError } from "axios"
 import {
   AbstractPaymentProvider,
+  ContainerRegistrationKeys,
   PaymentSessionStatus,
   PaymentActions,
   BigNumber,
@@ -37,7 +38,8 @@ import {
   UpdatePaymentInput,
   UpdatePaymentOutput,
   RetrievePaymentOutput,
-  RetrievePaymentInput
+  RetrievePaymentInput,
+  Logger
 } from "@medusajs/framework/types"
 
 import {
@@ -46,11 +48,14 @@ import {
   YookassaEvent
 } from "../types"
 
+type InjectedDependencies = {
+  logger: Logger
+}
 
 abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
   protected readonly options_: YookassaOptions
   protected yooCheckout_: YooCheckout
-  protected container_: Record<string, unknown>
+  protected logger_: Logger
 
   static validateOptions(options: YookassaOptions): void {
     if (!isDefined(options.shopId)) {
@@ -61,12 +66,12 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
     }
   }
 
-  protected constructor(container: Record<string, unknown>, options: YookassaOptions) {
+  protected constructor(container: InjectedDependencies, options: YookassaOptions) {
     // @ts-ignore
     super(...arguments)
 
+    this.logger_ = container.logger
     this.options_ = options
-    this.container_ = container
     this.yooCheckout_ = new YooCheckout({
       shopId: options.shopId,
       secretKey: options.secretKey,
@@ -109,9 +114,9 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
     data,
     context,
   }: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
-    console.log("initiatePayment data", data)
-    const additionalParameters = this.normalizePaymentParameters(data)
+    this.logger_.debug("YookassaBase.initiatePayment:\n" + JSON.stringify({currency_code, amount, data, context}, null, 2))
 
+    const additionalParameters = this.normalizePaymentParameters(data)
     const createPayload: ICreatePayment = {
       amount: {
         value: amount as string,
@@ -125,7 +130,6 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
 
     try {
       const response = await this.yooCheckout_.createPayment(createPayload, context?.idempotency_key)
-      console.log("response", response)
       const paymentId = "id" in response ? response.id : (data?.session_id as string)
       return {
         id: paymentId,
@@ -142,7 +146,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
   async getPaymentStatus({
     data
   }: GetPaymentStatusInput): Promise<GetPaymentStatusOutput> {
-    console.log("getPaymentStatus", data)
+    this.logger_.debug("YookassaBase.getPaymentStatus:\n" + JSON.stringify(data, null, 2))
+
     const id = data?.id as string
     if (!id) {
       throw this.buildError(
@@ -176,7 +181,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Capture an existing payment.
    */
   async capturePayment(input: CapturePaymentInput): Promise<CapturePaymentOutput> {
-    console.log("capturePayment", input)
+    this.logger_.debug("YookassaBase.capturePayment:\n" + JSON.stringify(input, null, 2))
+
     const payment = input.data as unknown as Payment
 
     // Avoid autoCapture in https://github.com/medusajs/medusa/blob/ceb504db2ce44dec43dff652fb306eb4e4f6059e/packages/modules/payment/src/services/payment-module.ts#L590
@@ -199,7 +205,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Authorize a payment by retrieving its status.
    */
   async authorizePayment(input: AuthorizePaymentInput): Promise<AuthorizePaymentOutput> {
-    console.log("authorizePayment", input)
+    this.logger_.debug("YookassaBase.authorizePayment:\n" + JSON.stringify(input, null, 2))
+
     const statusResponse = await this.getPaymentStatus(input)
     return statusResponse
   }
@@ -208,7 +215,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Cancel an existing payment.
    */
   async cancelPayment(input: CancelPaymentInput): Promise<CancelPaymentOutput> {
-    console.log("cancelPayment", input)
+    this.logger_.debug("YookassaBase.cancelPayment:\n" + JSON.stringify(input, null, 2))
+
     const paymentId = input.data?.id as string
     const idempotencyKey = input.context?.idempotency_key
 
@@ -224,7 +232,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Retrieve a payment.
    */
   async retrievePayment(input: RetrievePaymentInput): Promise<RetrievePaymentOutput> {
-    console.log("retrievePayment", input)
+    this.logger_.debug("YookassaBase.retrievePayment:\n" + JSON.stringify(input, null, 2))
+
     try {
       const payment = await this.yooCheckout_.getPayment(input.data?.id as string)
       return { data: payment as unknown as Record<string, unknown> }
@@ -241,7 +250,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
     data,
     context,
   }: RefundPaymentInput): Promise<RefundPaymentOutput> {
-    console.log("refundPayment", {amount, data, context})
+    this.logger_.debug("YookassaBase.refundPayment:\n" + JSON.stringify({amount, data, context}, null, 2))
+
     const payment = data as unknown as Payment
     const id = payment?.id
     if (!id) {
@@ -272,6 +282,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Payment deletion is not supported by YooKassa.
    */
   async deletePayment(input: DeletePaymentInput): Promise<DeletePaymentOutput> {
+    this.logger_.debug("YookassaBase.deletePayment:\n" + JSON.stringify(input, null, 2))
+
     return input
   }
 
@@ -280,6 +292,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Payment update is not supported by YooKassa.
    */
   async updatePayment(input: UpdatePaymentInput): Promise<UpdatePaymentOutput> {
+    this.logger_.debug("YookassaBase.updatePayment:\n" + JSON.stringify(input, null, 2))
+
     return input
   }
 
@@ -287,8 +301,8 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
    * Process webhook event and map it to Medusa action.
    */
   async getWebhookActionAndData(webhookData: ProviderWebhookPayload["payload"]): Promise<WebhookActionResult> {
-    console.log("webhookData", webhookData)
-    console.log("webhookData.data.object", webhookData.data.object)
+    this.logger_.debug("YookassaBase.getWebhookActionAndData:\n" + JSON.stringify(webhookData, null, 2))
+
     const isValid = await this.isWebhookEventValid(webhookData)
     if (!isValid)
       return {
