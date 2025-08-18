@@ -38,15 +38,6 @@ module.exports = defineConfig({
               paymentDescription: "Test payment"
             },
           },
-          // Used for testing
-          {
-            resolve: "@medusajs/medusa/payment-stripe",
-            id: "stripe",
-            options: {
-              apiKey: process.env.STRIPE_API_KEY,
-              capture: true
-            },
-          },
         ],
       },
     },

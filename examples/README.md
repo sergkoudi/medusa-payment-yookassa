@@ -1,5 +1,5 @@
 
-# Examples for `medusa-payment-yookassa`
+# `medusa-payment-yookassa` example
 
 Handy examples for setting up a development environment for the [medusa-payment-yookassa](https://www.npmjs.com/package/medusa-payment-yookassa) plugin.
 
@@ -14,13 +14,13 @@ Handy examples for setting up a development environment for the [medusa-payment-
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/sergkudinov/medusa-payment-yookassa
+   git clone https://github.com/sergkuodi/medusa-payment-yookassa
    ```
 
 2. Install the `medusa-payment-yookassa` plugin in local:
    ```bash
    # Open a separate terminal window and run
-   cd plugin
+   cd packages/medusa-payment-yookassa
    
    # Install
    yarn
@@ -53,7 +53,7 @@ Handy examples for setting up a development environment for the [medusa-payment-
 
    # Set up environment variables
    cp .env.template .env
-   # and configure your own `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY` and optional `STRIPE_API_KEY` inside .env
+   # and configure your own `YOOKASSA_SHOP_ID` and `YOOKASSA_SECRET_KEY` inside .env
 
    # Migrate the database
    npx medusa db:create # optional, must be already created in with Docker Compose
@@ -73,11 +73,11 @@ Handy examples for setting up a development environment for the [medusa-payment-
 5. Install and run the Medusa Storefront:
    ```bash
    # Open a separate terminal window and run
-   cd examples/medusa
+   cd examples/medusa-storefront
 
    # Set up environment variables
    cp .env.template .env
-   # and configure your own `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` and optional `NEXT_PUBLIC_STRIPE_KEY` inside .env
+   # and configure your own `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` inside .env
    
    # Run the Medusa Storefront
    yarn dev
