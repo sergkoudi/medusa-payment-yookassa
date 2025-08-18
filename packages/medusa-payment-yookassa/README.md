@@ -50,7 +50,7 @@ Join the [Medusa.js Chat](https://t.me/medusajs_chat) to connect with developers
 
 - Medusa server v2.7.0 or later
 - Node.js v20 or later
-- A [YooKassa](https://yookassa.ru/joinups/?source=ks) account, a shop identifier `shopId` and a secret API key `secretKey`.
+- A YooKassa account — [sign in or create one](https://yookassa.ru/joinups/?source=ks)
 
 ## Installation
 
@@ -80,7 +80,10 @@ module.exports = defineConfig({
               shopId: process.env.YOOKASSA_SHOP_ID,
               secretKey: process.env.YOOKASSA_SECRET_KEY,
               capture: true,
-              paymentDescription: "Test payment"
+              paymentDescription: "Test payment",
+              useReceipt: true,
+              taxItemDefault: 1,
+              taxShippingDefault: 1
             },
           }
         ]
@@ -90,7 +93,7 @@ module.exports = defineConfig({
 })
 ```
 
-Add environment variables:
+Add environment variables with your shop identifier `shopId` and a secret API key `secretKey`:
 
 ```
 YOOKASSA_SHOP_ID=1234567
