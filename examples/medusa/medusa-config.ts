@@ -35,7 +35,11 @@ module.exports = defineConfig({
               shopId: process.env.YOOKASSA_SHOP_ID,
               secretKey: process.env.YOOKASSA_SECRET_KEY,
               capture: true,
-              paymentDescription: "Test payment"
+              paymentDescription: "Test payment",
+              useReceipt: true,
+              taxSystemCode: 1,
+              taxItemDefault: 1,
+              taxShippingDefault: 1,
             },
           },
         ],

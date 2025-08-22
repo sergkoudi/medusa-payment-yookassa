@@ -90,7 +90,8 @@ const Payment = ({
             confirmation: {
               type: "redirect",
               return_url: `${getBaseURL()}/api/capture-payment/${cart?.id}?country_code=${countryCode}`
-            }
+            },
+            cart: cart
           }
         })
       }

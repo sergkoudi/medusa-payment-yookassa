@@ -16,7 +16,8 @@
     "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "medusa start",
-    "dev": "medusa develop",
+    "dev": "yarn predev && yarn && medusa develop",
+    "predev": "medusa plugin:add medusa-payment-yookassa",
     "dev:tunnel": "concurrently \"yarn dev\" \"yarn tunnel\"",
     "tunnel": "lt --port 9000 --subdomain medusa-yookassa",
     "db:migrate": "medusa db:migrate"
@@ -31,7 +32,7 @@
     "@mikro-orm/migrations": "6.4.3",
     "@mikro-orm/postgresql": "6.4.3",
     "awilix": "^8.0.1",
-    "medusa-payment-yookassa": "latest",
+    "medusa-payment-yookassa": "file:.yalc/medusa-payment-yookassa",
     "pg": "^8.13.0"
   },
   "devDependencies": {
