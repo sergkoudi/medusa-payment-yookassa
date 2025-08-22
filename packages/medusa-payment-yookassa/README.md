@@ -38,6 +38,16 @@ A Medusa plugin that provides YooKassa payments.
   </a>
 </p>
 
+## Features
+
+🛒 **Seamless integration** with the YooKassa payment system   
+📝 **Receipt generation** compliant with Federal Law No. 54, supporting FFD 1.05 and 1.2 formats   
+💳 **One-step** (autocapture) **and two-step** (authorization/hold) payment flows   
+🔄 **Full refund** and **order cancellation** support   
+📊 **Webhook support** for real-time payment status updates   
+🛡 **Webhook verification** for enhanced security   
+🔧 **Detailed logging** for debugging and transaction auditing   
+
 ## 💬 Plugin Support Chat on Telegram
 
 Join the [Medusa.js ⊷ YooKassa](https://t.me/medusajs_yookassa) community chat to discuss features and get support.
