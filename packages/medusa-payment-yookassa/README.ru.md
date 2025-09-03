@@ -63,7 +63,7 @@
 
 ## Требования
 
-- Medusa server v2.7.0 или выше  
+- Medusa v2.7.0 или выше  
 - Node.js v20 или выше  
 - Аккаунт YooKassa – [зарегистрируйтесь или войдите](https://yookassa.ru/joinups/?source=ks)
 
