@@ -25,10 +25,10 @@
 
 <p align="center">
   <a href="https://medusajs.com">
-    <img src="https://img.shields.io/badge/Medusa-^2.7.0-blue?logo=medusa" alt="Medusa" />
+    <img src="https://img.shields.io/badge/Medusa-^2.12.4-blue?logo=medusa" alt="Medusa" />
   </a>
   <a href="https://medusajs.com">
-    <img src="https://img.shields.io/badge/Протестировано_с_Medusa-v2.13.1-green?logo=checkmarx" alt="Medusa" />
+    <img src="https://img.shields.io/badge/Протестировано_с_Medusa-v2.13.3-green?logo=checkmarx" alt="Medusa" />
   </a>
 </p>
 
@@ -65,7 +65,7 @@
 
 ## Требования
 
-- Medusa v2.7.0 или выше  
+- Medusa v2.12.4 или выше  
 - Node.js v20 или выше  
 - Аккаунт YooKassa – [зарегистрируйтесь или войдите](https://yookassa.ru/joinups/?source=ks)
 
