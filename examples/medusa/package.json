@@ -23,14 +23,14 @@
     "db:migrate": "medusa db:migrate"
   },
   "dependencies": {
-    "@medusajs/admin-sdk": "2.13.3",
-    "@medusajs/cli": "2.13.3",
-    "@medusajs/framework": "2.13.3",
-    "@medusajs/medusa": "2.13.3",
-    "medusa-payment-yookassa": "latest"
+    "@medusajs/admin-sdk": "2.13.4",
+    "@medusajs/cli": "2.13.4",
+    "@medusajs/framework": "2.13.4",
+    "@medusajs/medusa": "2.13.4",
+    "medusa-payment-yookassa": "file:.yalc/medusa-payment-yookassa"
   },
   "devDependencies": {
-    "@medusajs/test-utils": "2.13.3",
+    "@medusajs/test-utils": "2.13.4",
     "@swc/core": "^1.7.28",
     "@swc/jest": "^0.2.36",
     "@types/jest": "^29.5.13",
