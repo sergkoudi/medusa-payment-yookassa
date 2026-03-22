@@ -157,7 +157,7 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
     const receiptTemplate = buildReceiptTemplate(receipt)
     const createPayload: ICreatePayment = {
       amount: {
-        value: amount as string,
+        value: String(Number(amount).toFixed(2)),
         currency: currency_code.toUpperCase(), // Medusa stores currency codes in lower case of ISO-4217
       },
       metadata: {
@@ -165,7 +165,7 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
         receip_tmp: receiptTemplate
       },
       ...additionalParameters,
-      ...(this.options_.useReceipt ? { receipt: receipt } : {}),
+      ...(this.options_.useReceipt && receipt?.items?.length ? { receipt: receipt } : {}),
     }
 
     try {
