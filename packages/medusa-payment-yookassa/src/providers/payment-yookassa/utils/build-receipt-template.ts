@@ -2,6 +2,9 @@ import { IReceipt } from "@a2seven/yoo-checkout"
 
 export function buildReceiptTemplate(receipt: IReceipt) {
   const firstItem = receipt.items?.[0]
+  if (!firstItem || !firstItem.amount) {
+    return "{}"
+  }
   const tpl = {
     cur: firstItem.amount.currency,
     vat: firstItem?.vat_code,
