@@ -70,6 +70,10 @@ export function generateReceipt(
     })
   }
 
+  if (receiptItems.length === 0) {
+    throw new Error("Receipt items cannot be empty")
+  }
+
   receipt.items = receiptItems
   return receipt
 }

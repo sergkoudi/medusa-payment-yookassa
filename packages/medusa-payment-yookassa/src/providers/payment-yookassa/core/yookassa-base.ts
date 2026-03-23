@@ -147,12 +147,16 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
 
     let receipt = {} as IReceipt
     if (this.options_.useReceipt && cart) {
-      receipt = generateReceipt(
-        this.options_.taxSystemCode,
-        this.options_.taxItemDefault!,
-        this.options_.taxShippingDefault!,
-        cart
-      )
+      try {
+        receipt = generateReceipt(
+          this.options_.taxSystemCode,
+          this.options_.taxItemDefault!,
+          this.options_.taxShippingDefault!,
+          cart
+        )
+      } catch (e: Error | unknown) {
+        this.logger_.warn(`Receipt generation failed in YookassaBase.initiatePayment for cart ${cart?.id}: ${e instanceof Error ? e.message : String(e)}. Skipping receipt generation.`)
+      }
     }
     const receiptTemplate = buildReceiptTemplate(receipt)
     const createPayload: ICreatePayment = {
@@ -165,7 +169,7 @@ abstract class YookassaBase extends AbstractPaymentProvider<YookassaOptions> {
         receip_tmp: receiptTemplate
       },
       ...additionalParameters,
-      ...(this.options_.useReceipt && receipt?.items?.length ? { receipt: receipt } : {}),
+      ...(this.options_.useReceipt && receipt?.items?.length ? { receipt } : {}),
     }
 
     try {
