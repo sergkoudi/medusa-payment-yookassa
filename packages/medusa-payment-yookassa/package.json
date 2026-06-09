@@ -1,6 +1,6 @@
 {
   "name": "medusa-payment-yookassa",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "YooKassa payment provider for Medusa",
   "author": "Sergei Kudinov",
   "license": "MIT",
@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@a2seven/yoo-checkout": "^1.1.4",
+    "@gorgo/telemetry": "^1.0.1",
     "axios": "^1.9.0"
   },
   "devDependencies": {

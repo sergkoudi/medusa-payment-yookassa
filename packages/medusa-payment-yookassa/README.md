@@ -1,3 +1,6 @@
+> ⚠️ **This package is deprecated and no longer maintained.**  
+> It has moved to [`@gorgo/medusa-payment-yookassa`](https://www.npmjs.com/package/@gorgo/medusa-payment-yookassa) - please install the new package to keep receiving updates and fixes.
+
 <p align="center">
   <a href="https://www.medusajs.com">
     <picture>
@@ -33,8 +36,8 @@ YooKassa Payments for Medusa
 </p>
 
 <p align="center">
-  <a href="https://t.me/medusajs_yookassa">
-    <img src="https://img.shields.io/badge/Telegram-Medusa.js⊷YooKassa_Support_Chat-0088cc?logo=telegram&style=social" alt="Medusa.js⊷YooKassa on Telegram" />
+  <a href="https://t.me/gorgojs_chat">
+    <img src="https://img.shields.io/badge/Telegram-Support_Chat-0088cc?logo=telegram&style=social" alt="Telegram Support Chat" />
   </a>
 </p>
 

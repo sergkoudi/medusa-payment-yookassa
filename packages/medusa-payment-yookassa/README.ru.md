@@ -1,3 +1,6 @@
+> ⚠️ **Этот пакет устарел и больше не поддерживается.**  
+> Он переехал в [`@gorgo/medusa-payment-yookassa`](https://www.npmjs.com/package/@gorgo/medusa-payment-yookassa) - установите новый пакет, чтобы продолжать получать обновления и исправления.
+
 <p align="center">
   <a href="https://www.medusajs.com">
     <picture>
@@ -33,8 +36,8 @@
 </p>
 
 <p align="center">
-  <a href="https://t.me/medusajs_yookassa">
-    <img src="https://img.shields.io/badge/Telegram-Чат_поддержки_Medusa.js⊷YooKassa-0088cc?logo=telegram&style=social" alt="Чат Medusa.js⊷YooKassa в Telegram" />
+  <a href="https://t.me/gorgojs_chat">
+    <img src="https://img.shields.io/badge/Telegram-Чат_поддержки-0088cc?logo=telegram&style=social" alt="Чат поддержки в Telegram" />
   </a>
 </p>
 
